@@ -50,8 +50,29 @@ Log.Logger = new LoggerConfiguration()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        // Đặt tiêu đề
+        options.DocumentTitle = "HealthyNutrition API";
+
+        //    // Đường dẫn đến file JSON của Swagger
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "HealthyNutrition API V1");
+
+        // Inject JavaScript để chuyển đổi theme
+        //options.InjectJavascript("/theme-switcher.js");
+
+        // Inject CSS để tùy chỉnh giao diện
+        options.InjectStylesheet("/swagger-dark-theme.css");
+    });
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 

@@ -6,5 +6,5 @@ namespace BookSoulsApp.Application.ThirdPartyServiceInterfaces.Cloudinary;
 
 public interface ICloudinaryService
 {
-    public ImageUploadResult UploadImage(IFormFile imageFile, ImageTag imageTag, string rootFolder = "Image");
+    public ImageUploadResult UploadImage(IFormFile imageFile, ImageTag imageTag, string rootFolder = "Avatar");
 }

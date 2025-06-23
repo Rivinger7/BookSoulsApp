@@ -16,7 +16,7 @@ public class CloudinaryService(Cloudinary cloudinary, IHttpContextAccessor httpC
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     #region UploadImage
-    public ImageUploadResult UploadImage(IFormFile imageFile, ImageTag imageTag, string rootFolder = "Image")
+    public ImageUploadResult UploadImage(IFormFile imageFile, ImageTag imageTag, string rootFolder = "Avatar")
     {
         // UserId lấy từ phiên người dùng có thể là FE hoặc BE
         //string userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException("Your session is limit, you must login again to edit profile!");

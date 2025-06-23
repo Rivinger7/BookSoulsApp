@@ -96,8 +96,12 @@ public static class DependencyInjection
 
     public static void AddServices(this IServiceCollection services)
     {
-        //services.AddScoped<ITrackService, TrackService>();
-        //services.AddScoped<IArtistService, ArtistService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IBookService, BookService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IPublisherService, PublisherService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IJsonWebToken, JsonWebToken>();
     }
 
     public static void AddCloudinary(this IServiceCollection services)

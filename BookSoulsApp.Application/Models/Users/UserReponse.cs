@@ -1,10 +1,9 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using BookSoulsApp.Application.Mappers;
+using BookSoulsApp.Domain.Entities;
 
-namespace BookSoulsApp.Domain.Entities;
-public class User
+namespace BookSoulsApp.Application.Models.Users;
+public class UserReponse : IMapFrom<User>
 {
-    [BsonId]
-    [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
     public string Id { get; set; }
     public string FullName { get; set; }
     public string Email { get; set; }
@@ -14,8 +13,7 @@ public class User
     public string Gender { get; set; }
     public string Avatar { get; set; }
     public Address? Address { get; set; }
-    public bool IsDeleted { get; set; } = false;
+
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
-

@@ -7,10 +7,7 @@ namespace BookSoulsApp.Domain.Enums
         [EnumMember(Value = "Users_Profile")]
         Users_Profile,
 
-        [EnumMember(Value = "Product")]
-        Product,
-
-        [EnumMember(Value = "Blogs")]
-        Blog
+        [EnumMember(Value = "Book")]
+        Book
     }
 }
