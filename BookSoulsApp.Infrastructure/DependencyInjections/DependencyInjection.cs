@@ -100,6 +100,7 @@ public static class DependencyInjection
         services.AddScoped<IBookService, BookService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPublisherService, PublisherService>();
+        services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJsonWebToken, JsonWebToken>();
     }
