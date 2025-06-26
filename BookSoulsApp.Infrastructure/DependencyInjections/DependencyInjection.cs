@@ -103,6 +103,7 @@ public static class DependencyInjection
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJsonWebToken, JsonWebToken>();
+        services.AddScoped<INotificationService, NotificationService>();
     }
 
     public static void AddCloudinary(this IServiceCollection services)
