@@ -6,6 +6,7 @@ using BookSoulsApp.Application.Models.Reviews;
 using BookSoulsApp.Application.ServiceInterfaces;
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Exceptions;
+using BookSoulsApp.Domain.Utils;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using static System.Reflection.Metadata.BlobBuilder;
@@ -27,7 +28,7 @@ public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper) : INoti
 			UserId = createNotificationRequest.UserId,
 			Title = createNotificationRequest.Title,
 			Content = createNotificationRequest.Content,
-			CreatedAt = DateTime.UtcNow,
+			CreatedAt = TimeControl.GetUtcPlus7Time(),
 		};
 		await _unitOfWork.GetCollection<Notification>().InsertOneAsync(notification);
     }
@@ -63,7 +64,7 @@ public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper) : INoti
 		// Date
 		if (notificationFilterRequest.FromDate.HasValue && notificationFilterRequest.ToDate.HasValue)
 		{
-			query = query.Where(n => n.CreatedAt >= notificationFilterRequest.FromDate.Value && r.CreatedAt <= notificationFilterRequest.ToDate.Value);
+			query = query.Where(n => n.CreatedAt >= notificationFilterRequest.FromDate.Value && n.CreatedAt <= notificationFilterRequest.ToDate.Value);
 		}
 		else if (notificationFilterRequest.FromDate.HasValue)
 		{

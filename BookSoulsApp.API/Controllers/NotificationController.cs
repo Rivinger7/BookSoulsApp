@@ -24,23 +24,23 @@ public class NotificationController(INotificationService notificationService) : 
 	}
 
 	[Authorize(Roles = "Customer"), HttpPut("{id}")]
-	public async Task<IActionResult> MarkNotificationAsRead(string notificationId)
+	public async Task<IActionResult> MarkNotificationAsRead(string id)
 	{
-		await _notificationService.MarkNotificationAsReadAsync(notificationId);
+		await _notificationService.MarkNotificationAsReadAsync(id);
 		return Ok(new {Message = "Mark notification as read successfully"});
 	}
 
-	[Authorize(Roles = "Admin"), HttpPost]
+	[Authorize(Roles = "Admin, User, Staff"), HttpPost]
 	public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationRequest createNotificationRequest)
 	{
 		await _notificationService.CreateNotificationAsync(createNotificationRequest);
 		return Ok(new { Message = "Created review successfully" });
 	}
 
-	[Authorize(Roles ="Admin"), HttpDelete("{id}")]
-	public async Task<IActionResult> DeleteNotification(string notificationId)
+	[Authorize(Roles = "Admin, User, Staff"), HttpDelete("{id}")]
+	public async Task<IActionResult> DeleteNotification(string id)
 	{
-		await _notificationService.DeletedNotificationByIdAsync(notificationId);
+		await _notificationService.DeletedNotificationByIdAsync(id);
 		return Ok(new { Message = "Deleted notification successfully" });
 	}
 
