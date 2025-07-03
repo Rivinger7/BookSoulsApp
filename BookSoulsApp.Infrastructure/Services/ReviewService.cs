@@ -157,7 +157,7 @@ public class ReviewService(IUnitOfWork unitOfWork, IMapper mapper) : IReviewServ
             .FirstOrDefaultAsync();
 
         UpdateDefinition<Book> updateDefinition = Builders<Book>.Update
-            .Set(b => b.Rating, (rating + createReviewRequest.Rating) / (reviewCount + 1))
+            .Set(b => b.Rating, (rating * reviewCount + createReviewRequest.Rating) / (reviewCount + 1))
             .Inc(b => b.RatingCount, 1)
             .Set(b => b.UpdatedAt, TimeControl.GetUtcPlus7Time());
 
