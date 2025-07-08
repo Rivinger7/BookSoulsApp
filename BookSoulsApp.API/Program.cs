@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env file
 EnvironmentVariableLoader.LoadEnvironmentVariable();
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 

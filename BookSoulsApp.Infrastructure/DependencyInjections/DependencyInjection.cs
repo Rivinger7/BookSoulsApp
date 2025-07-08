@@ -2,11 +2,13 @@
 using BookSoulsApp.Application.Mappers;
 using BookSoulsApp.Application.ServiceInterfaces;
 using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Cloudinary;
+using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Payment;
 using BookSoulsApp.Domain.Enums.SchemaFilter;
 using BookSoulsApp.Domain.Exceptions;
 using BookSoulsApp.Domain.Utils;
 using BookSoulsApp.Infrastructure.Services;
 using BookSoulsApp.Infrastructure.ThirdPartyServices.Cloudinaries;
+using BookSoulsApp.Infrastructure.ThirdPartyServices.Payment;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -103,6 +105,8 @@ public static class DependencyInjection
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJsonWebToken, JsonWebToken>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IPayosService, PayosService>();
     }
 
     public static void AddCloudinary(this IServiceCollection services)
