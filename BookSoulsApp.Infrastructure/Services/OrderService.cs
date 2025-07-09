@@ -146,7 +146,10 @@ namespace BookSoulsApp.Infrastructure.Services
             List<UpdateDefinition<Order>> updates = [];
             updates.Add(updateBuilder.Set(o => o.OrderStatus, OrderStatus.Cancel));
             updates.Add(updateBuilder.Set(o => o.CancelReason, cancelReason));
-            updates.Add(updateBuilder.Set(o => o.PaymentStatus, PaymentStatus.Refund));
+            if (order.PaymentStatus == PaymentStatus.Paid)
+            {
+                updates.Add(updateBuilder.Set(o => o.PaymentStatus, PaymentStatus.Refund));
+            }
             UpdateDefinition<Order> updateDefinition = updateBuilder.Combine(updates);
 
             UpdateResult updateResult = await _unitOfWork.GetCollection<Order>()
