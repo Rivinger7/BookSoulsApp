@@ -2,19 +2,30 @@
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Utils;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Concurrent;
 
 namespace BookSoulsApp.Infrastructure.Services;
-public class ChatHub(IUnitOfWork unitOfWork) : Hub
+public class ChatHub(IUnitOfWork unitOfWork, ILogger <ChatHub> logger) : Hub
 {
     private static readonly ConcurrentDictionary<string, string> OnlineUsers = []; // readerId -> senderConnectionId
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly ILogger<ChatHub> _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
         string? userId = Context.User?.FindFirst("Id")?.Value;
+
+        Console.WriteLine("================================================");
+        Console.WriteLine(OnlineUsers.Count);
+        Console.WriteLine($"User connected: {userId} with ConnectionId: {Context.ConnectionId}");
+        foreach (var user in OnlineUsers)
+        {
+            Console.WriteLine($"UserId: {user.Key}, ConnectionId: {user.Value}");
+        }
+        Console.WriteLine("================================================");
 
         if (string.IsNullOrEmpty(userId))
         {
@@ -96,10 +107,19 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
                 Builders<Conversation>.Filter.Eq(c => c.Id, conversationId),
                 update);
 
-            // SignalR push to receiver
-            if (OnlineUsers.TryGetValue(receiverId, out string? receiverConnId))
+            if(OnlineUsers.TryGetValue(receiverId, out string? receiverConnId))
             {
-                await Clients.Client(receiverConnId).SendAsync("ReceiveMessage", message);
+                _logger.LogInformation($"Message sent from {senderId} to {receiverId} in conversation {conversationId}. Receiver connection ID: {receiverConnId}");
+            }
+            else
+            {
+                _logger.LogWarning($"Receiver {receiverId} is offline. Message will be sent when they come online.");
+            }
+
+            // SignalR push to receiver
+            if (OnlineUsers.TryGetValue(receiverId, out string? receiverConnectionId))
+            {
+                await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", message);
             }
 
             // Optional: return ack
