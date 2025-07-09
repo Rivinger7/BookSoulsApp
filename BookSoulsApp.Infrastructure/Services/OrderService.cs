@@ -110,6 +110,7 @@ namespace BookSoulsApp.Infrastructure.Services
             List<UpdateDefinition<Order>> updates = [];
             updates.Add(updateBuilder.Set(o => o.OrderStatus, OrderStatus.Cancel));
             updates.Add(updateBuilder.Set(o => o.CancelReason, cancelReason));
+            updates.Add(updateBuilder.Set(o => o.PaymentStatus, PaymentStatus.Refund));
             UpdateDefinition<Order> updateDefinition = updateBuilder.Combine(updates);
 
             UpdateResult updateResult = await _unitOfWork.GetCollection<Order>()
@@ -122,6 +123,11 @@ namespace BookSoulsApp.Infrastructure.Services
         }
         public async Task ChangeOrderStatus(string orderId, OrderStatus status)
         {
+            if (status == OrderStatus.Cancel)
+            {
+                await CancelOrder(orderId, "Store don't accept order");
+                return;
+            }
             // Mark the book as deleted
             UpdateResult updateResult = await _unitOfWork.GetCollection<Order>()
                 .UpdateOneAsync(c => c.Id == orderId, Builders<Order>.Update.Set(c => c.OrderStatus, status));

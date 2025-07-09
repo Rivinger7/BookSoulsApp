@@ -28,21 +28,24 @@ namespace BookSoulsApp.API.Controllers
             return Ok(new { message = $"Order with ID {id} retrieved successfully", result });
         }
 
-        [Authorize(Roles = "Customer"), HttpPost]
+        //[Authorize(Roles = "Customer"), HttpPost]
+        [AllowAnonymous, HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderRequest req)
         {
             string checkout = await _orderService.CreateOrder(req);
             return Ok(checkout);
         }
 
-        [Authorize(Roles = "Customer, Staff"), HttpPost("{id}/cancel")]
+        //[Authorize(Roles = "Customer, Staff"), HttpPost("{id}/cancel")]
+        [AllowAnonymous, HttpPost("{id}/cancel")]
         public async Task<IActionResult> CancelOrder(string id, string cancelReason)
         {
             await _orderService.CancelOrder(id, cancelReason);
             return Ok(new { Message = "Cancel Order Successfully" });
         }
 
-        [Authorize(Roles = "Staff"), HttpPost("{id}/status-change")]
+        //[Authorize(Roles = "Staff"), HttpPost("{id}/status-change")]
+        [AllowAnonymous, HttpPost("{id}/status-change")]
         public async Task<IActionResult> ChangeOrderStatus(string id, OrderStatus status)
         {
             await _orderService.ChangeOrderStatus(id, status);
