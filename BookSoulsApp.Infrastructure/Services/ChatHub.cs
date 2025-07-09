@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 namespace BookSoulsApp.Infrastructure.Services;
 public class ChatHub(IUnitOfWork unitOfWork) : Hub
 {
-    private static readonly ConcurrentDictionary<string, string> OnlineUsers = []; // userId -> senderConnectionId
+    private static readonly ConcurrentDictionary<string, string> OnlineUsers = []; // readerId -> senderConnectionId
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public override async Task OnConnectedAsync()
@@ -66,7 +66,7 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
                     };
                     await _unitOfWork.GetCollection<Conversation>().InsertOneAsync(conversation);
                 }
-                
+
                 conversationId = conversation.Id;
             }
 
@@ -113,12 +113,12 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
     }
 
     // MARK AS READ
-    public async Task MarkAsRead(string conversationId, string userId)
+    public async Task MarkAsRead(string conversationId, string readerId)
     {
         // Mark all as read
         FilterDefinition<Message> filter = Builders<Message>.Filter.And(
             Builders<Message>.Filter.Eq(x => x.ConversationId, conversationId),
-            Builders<Message>.Filter.Eq(x => x.ReceiverId, userId),
+            Builders<Message>.Filter.Eq(x => x.ReceiverId, readerId),
             Builders<Message>.Filter.Eq(x => x.IsRead, false)
         );
 
@@ -127,19 +127,23 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
         // Update lastMessage.isReadBy
         await _unitOfWork.GetCollection<Conversation>().UpdateOneAsync(
             Builders<Conversation>.Filter.Eq(x => x.Id, conversationId),
-            Builders<Conversation>.Update.AddToSet("lastMessage.isReadBy", userId)
+            Builders<Conversation>.Update.AddToSet("lastMessage.isReadBy", readerId)
         );
 
         // Push seen to other client
+        // A là người nhận tin nhắn từ B
+        // A mở đoạn chat => gọi MarkAsRead
+        // Server đánh dấu đã đọc các tin nhắn B gửi cho A
+        // Server gửi "MessageSeen" cho B, để B biết A đã đọc
         Conversation otherUser = await _unitOfWork.GetCollection<Conversation>().Find(x => x.Id == conversationId).FirstOrDefaultAsync();
-        string? receiverId = otherUser.UserIds.FirstOrDefault(u => u != userId);
+        string? partnerUserId = otherUser.UserIds.FirstOrDefault(u => u != readerId);
 
-        if (receiverId != null && OnlineUsers.TryGetValue(receiverId, out string? connectionId))
+        if (partnerUserId != null && OnlineUsers.TryGetValue(partnerUserId, out string? connectionId))
         {
             await Clients.Client(connectionId).SendAsync("MessageSeen", new
             {
                 ConversationId = conversationId,
-                SeenBy = userId
+                SeenBy = readerId
             });
         }
     }
