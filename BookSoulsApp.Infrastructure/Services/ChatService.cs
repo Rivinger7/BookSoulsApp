@@ -14,7 +14,7 @@ public class ChatService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContex
 
     public async Task<IEnumerable<ConversationResponse>> GetConversationsAsync()
     {
-        string userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedCustomException("Your session is limit, you must login again!");
+        string userId = _httpContextAccessor.HttpContext?.User.FindFirst("Id")?.Value ?? throw new UnauthorizedCustomException("Your session is limit, you must login again!");
 
         FilterDefinition<Conversation> filter = Builders<Conversation>.Filter.AnyEq(c => c.UserIds, userId);
 
@@ -36,7 +36,7 @@ public class ChatService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContex
 
     public async Task<IEnumerable<MessageResponse>> GetMessagesAsync(string conversationId)
     {
-        string userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedCustomException("Your session is limit, you must login again!");
+        string userId = _httpContextAccessor.HttpContext?.User.FindFirst("Id")?.Value ?? throw new UnauthorizedCustomException("Your session is limit, you must login again!");
 
         FilterDefinition<Message> filter = Builders<Message>.Filter.Eq(m => m.ConversationId, conversationId);
 
