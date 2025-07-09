@@ -38,8 +38,8 @@ namespace BookSoulsApp.API.Controllers
         [AllowAnonymous, HttpPost("webhook-handle")]
         public async Task<IActionResult> HandleWebhook()
         {
-            Console.WriteLine("Webhook received (test mode)");
-            return Ok("Webhook endpoint ready"); // Tạm thời luôn trả OK để qua bước verify webhook
+            //Console.WriteLine("Webhook received (test mode)");
+            //return Ok("Webhook endpoint ready"); // Tạm thời luôn trả OK để qua bước verify webhook
 
             using var reader = new StreamReader(Request.Body);
             string rawBody = await reader.ReadToEndAsync();
