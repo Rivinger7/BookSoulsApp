@@ -47,6 +47,8 @@ public class ChatService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContex
         IEnumerable<MessageResponse> responses = messages.Select(m => new MessageResponse
         {
             Id = m.Id.ToString(),
+            ConversationId = m.ConversationId,
+            ReceiverId = m.ReceiverId,
             SenderId = m.SenderId,
             Text = m.DeletedFor.Contains(userId) ? "Tin nhắn đã thu hồi" : m.Text,
             SentAt = m.SentAt,
