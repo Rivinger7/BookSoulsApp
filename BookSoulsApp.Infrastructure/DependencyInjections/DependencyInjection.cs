@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddDatabase();
         services.AddServices();
 
+        services.AddSignalR();
+
         services.AddCloudinary();
 
         services.AddEnumMemberSerializer();
@@ -107,6 +109,7 @@ public static class DependencyInjection
         services.AddScoped<IJsonWebToken, JsonWebToken>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IPayosService, PayosService>();
+        services.AddScoped<IChatService, ChatService>();
     }
 
     public static void AddCloudinary(this IServiceCollection services)

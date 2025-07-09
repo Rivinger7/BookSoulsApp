@@ -2,6 +2,7 @@
 using BookSoulsApp.API.Filters;
 using BookSoulsApp.Domain.Exceptions;
 using BookSoulsApp.Infrastructure.DependencyInjections;
+using BookSoulsApp.Infrastructure.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,10 +58,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         // Đặt tiêu đề
-        options.DocumentTitle = "HealthyNutrition API";
+        options.DocumentTitle = "BookSouls API";
 
         //    // Đường dẫn đến file JSON của Swagger
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "HealthyNutrition API V1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BookSouls API V1");
 
         // Inject JavaScript để chuyển đổi theme
         //options.InjectJavascript("/theme-switcher.js");
@@ -85,5 +86,7 @@ app.UseAuthorization();
 app.UseCors("AllowSpecificOrigin");
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chat");
 
 app.Run();
