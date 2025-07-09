@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.SignalR;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Concurrent;
-using System.Security.Claims;
 
 namespace BookSoulsApp.Infrastructure.Services;
 public class ChatHub(IUnitOfWork unitOfWork) : Hub
@@ -53,18 +52,21 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
             // Nếu chưa có conversationId, tìm hoặc tạo
             if (string.IsNullOrEmpty(conversationId))
             {
-                //var conv = await _unitOfWork.GetCollection<Conversation>()
-                //    .Find(c => c.UserIds.Contains(senderId) && c.UserIds.Contains(receiverId))
-                //    .FirstOrDefaultAsync();
+                Conversation conversation = await _unitOfWork.GetCollection<Conversation>()
+                    .Find(c => c.UserIds.Contains(senderId) && c.UserIds.Contains(receiverId))
+                    .FirstOrDefaultAsync();
 
-                Conversation conversation = new()
+                if (conversation is null)
                 {
-                    Id = ObjectId.GenerateNewId().ToString(),
-                    UserIds = [senderId, receiverId],
-                    CreatedAt = TimeControl.GetUtcPlus7Time(),
-                };
-                await _unitOfWork.GetCollection<Conversation>().InsertOneAsync(conversation);
-
+                    conversation = new()
+                    {
+                        Id = ObjectId.GenerateNewId().ToString(),
+                        UserIds = [senderId, receiverId],
+                        CreatedAt = TimeControl.GetUtcPlus7Time(),
+                    };
+                    await _unitOfWork.GetCollection<Conversation>().InsertOneAsync(conversation);
+                }
+                
                 conversationId = conversation.Id;
             }
 

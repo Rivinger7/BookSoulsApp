@@ -11,14 +11,14 @@ public class ChatController(IChatService chatService) : ControllerBase
 {
     private readonly IChatService _chatService = chatService;
 
-    [Authorize(Roles = "Staff,Customer"), HttpGet("conversation")]
-    public IActionResult CreateConversation()
+    [Authorize(Roles = "Staff,Customer"), HttpGet("conversations")]
+    public IActionResult GetConversations()
     {
         var result = _chatService.GetConversationsAsync();
         return Ok(new { message = "Get conversations successfully.", result });
     }
 
-    [Authorize(Roles = "Staff,Customer"), HttpGet("messages/{conversationId}")]
+    [Authorize(Roles = "Staff,Customer"), HttpGet("{conversationId}/messages")]
     public IActionResult GetMessages(string conversationId)
     {
         var result = _chatService.GetMessagesAsync(conversationId);
