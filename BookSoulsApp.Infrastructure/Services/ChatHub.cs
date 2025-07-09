@@ -15,7 +15,7 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
 
     public override async Task OnConnectedAsync()
     {
-        string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        string? userId = Context.User?.FindFirst("Id")?.Value;
 
         if (string.IsNullOrEmpty(userId))
         {
