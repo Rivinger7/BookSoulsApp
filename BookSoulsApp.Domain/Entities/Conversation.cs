@@ -13,8 +13,8 @@ public class Conversation
 
     public LastMessage? LastMessage { get; set; }
 
-    [BsonRepresentation(BsonType.ObjectId)]
-    public Dictionary<string, bool> DeletedFor { get; set; } = []; // userId => true if deleted
+    //[BsonRepresentation(BsonType.ObjectId)]
+    //public Dictionary<string, bool> DeletedFor { get; set; } = []; // userId => true if deleted
 
     public DateTime CreatedAt { get; set; }
 
