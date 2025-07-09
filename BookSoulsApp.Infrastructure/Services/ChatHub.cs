@@ -2,17 +2,15 @@
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Utils;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Concurrent;
 
 namespace BookSoulsApp.Infrastructure.Services;
-public class ChatHub(IUnitOfWork unitOfWork, ILogger <ChatHub> logger) : Hub
+public class ChatHub(IUnitOfWork unitOfWork) : Hub
 {
     private static readonly ConcurrentDictionary<string, string> OnlineUsers = []; // readerId -> senderConnectionId
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly ILogger<ChatHub> _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
