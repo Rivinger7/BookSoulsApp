@@ -18,15 +18,6 @@ public class ChatHub(IUnitOfWork unitOfWork, ILogger <ChatHub> logger) : Hub
     {
         string? userId = Context.User?.FindFirst("Id")?.Value;
 
-        Console.WriteLine("================================================");
-        Console.WriteLine(OnlineUsers.Count);
-        Console.WriteLine($"User connected: {userId} with ConnectionId: {Context.ConnectionId}");
-        foreach (var user in OnlineUsers)
-        {
-            Console.WriteLine($"UserId: {user.Key}, ConnectionId: {user.Value}");
-        }
-        Console.WriteLine("================================================");
-
         if (string.IsNullOrEmpty(userId))
         {
             // Gửi lỗi rồi disconnect
@@ -107,15 +98,6 @@ public class ChatHub(IUnitOfWork unitOfWork, ILogger <ChatHub> logger) : Hub
                 Builders<Conversation>.Filter.Eq(c => c.Id, conversationId),
                 update);
 
-            if(OnlineUsers.TryGetValue(receiverId, out string? receiverConnId))
-            {
-                _logger.LogInformation($"Message sent from {senderId} to {receiverId} in conversation {conversationId}. Receiver connection ID: {receiverConnId}");
-            }
-            else
-            {
-                _logger.LogWarning($"Receiver {receiverId} is offline. Message will be sent when they come online.");
-            }
-
             // SignalR push to receiver
             if (OnlineUsers.TryGetValue(receiverId, out string? receiverConnectionId))
             {
@@ -123,7 +105,7 @@ public class ChatHub(IUnitOfWork unitOfWork, ILogger <ChatHub> logger) : Hub
             }
 
             // Optional: return ack
-            await Clients.Caller.SendAsync("MessageSent", message);
+            //await Clients.Caller.SendAsync("MessageSent", message);
         }
         catch (Exception ex)
         {
