@@ -19,7 +19,7 @@ public class ChatService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContex
         FilterDefinition<Conversation> filter = Builders<Conversation>.Filter.AnyEq(c => c.UserIds, userId);
 
         IEnumerable<Conversation> conversations = await _unitOfWork.GetCollection<Conversation>().Find(filter)
-            .SortByDescending(c => c.UpdatedAt)
+            .SortBy(c => c.UpdatedAt)
             .ToListAsync();
 
         IEnumerable<ConversationResponse> responses = conversations.Select(c => new ConversationResponse
@@ -41,7 +41,7 @@ public class ChatService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContex
         FilterDefinition<Message> filter = Builders<Message>.Filter.Eq(m => m.ConversationId, conversationId);
 
         IEnumerable<Message> messages = await _unitOfWork.GetCollection<Message>().Find(filter)
-            .SortByDescending(m => m.SentAt)
+            .SortBy(m => m.SentAt)
             .ToListAsync();
 
         IEnumerable<MessageResponse> responses = messages.Select(m => new MessageResponse
