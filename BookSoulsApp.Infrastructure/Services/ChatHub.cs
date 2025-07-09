@@ -48,62 +48,66 @@ public class ChatHub(IUnitOfWork unitOfWork) : Hub
     // SEND MESSAGE
     public async Task SendMessage(string conversationId, string senderId, string receiverId, string text)
     {
-        // Nếu chưa có conversationId, tìm hoặc tạo
-        if (string.IsNullOrEmpty(conversationId))
+        try
         {
-            var conv = await _unitOfWork.GetCollection<Conversation>()
-                .Find(c => c.UserIds.Contains(senderId) && c.UserIds.Contains(receiverId))
-                .FirstOrDefaultAsync();
-
-            if (conv == null)
+            // Nếu chưa có conversationId, tìm hoặc tạo
+            if (string.IsNullOrEmpty(conversationId))
             {
-                conv = new Conversation
+                //var conv = await _unitOfWork.GetCollection<Conversation>()
+                //    .Find(c => c.UserIds.Contains(senderId) && c.UserIds.Contains(receiverId))
+                //    .FirstOrDefaultAsync();
+
+                Conversation conversation = new()
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
                     UserIds = [senderId, receiverId],
                     CreatedAt = TimeControl.GetUtcPlus7Time(),
-                    UpdatedAt = TimeControl.GetUtcPlus7Time()
                 };
-                await _unitOfWork.GetCollection<Conversation>().InsertOneAsync(conv);
+                await _unitOfWork.GetCollection<Conversation>().InsertOneAsync(conversation);
+
+                conversationId = conversation.Id;
             }
 
-            conversationId = conv.Id;
-        }
-
-        Message message = new()
-        {
-            ConversationId = conversationId,
-            SenderId = senderId,
-            ReceiverId = receiverId,
-            Text = text,
-            SentAt = TimeControl.GetUtcPlus7Time(),
-        };
-
-        await _unitOfWork.GetCollection<Message>().InsertOneAsync(message);
-
-        // Update lastMessage
-        UpdateDefinition<Conversation> update = Builders<Conversation>.Update
-            .Set(c => c.LastMessage, new LastMessage
+            Message message = new()
             {
-                Text = text,
+                ConversationId = conversationId,
                 SenderId = senderId,
-                SentAt = message.SentAt,
-                IsReadBy = [senderId]
-            })
-            .Set(c => c.UpdatedAt, TimeControl.GetUtcPlus7Time());
+                ReceiverId = receiverId,
+                Text = text,
+                SentAt = TimeControl.GetUtcPlus7Time(),
+            };
 
-        await _unitOfWork.GetCollection<Conversation>().UpdateOneAsync(
-            Builders<Conversation>.Filter.Eq(c => c.Id, conversationId),
-            update);
+            await _unitOfWork.GetCollection<Message>().InsertOneAsync(message);
 
-        // SignalR push to receiver
-        if (OnlineUsers.TryGetValue(receiverId, out string? receiverConnId))
-        {
-            await Clients.Client(receiverConnId).SendAsync("ReceiveMessage", message);
+            // Update lastMessage
+            UpdateDefinition<Conversation> update = Builders<Conversation>.Update
+                .Set(c => c.LastMessage, new LastMessage
+                {
+                    Text = text,
+                    SenderId = senderId,
+                    SentAt = message.SentAt,
+                    IsReadBy = [senderId]
+                })
+                .Set(c => c.UpdatedAt, TimeControl.GetUtcPlus7Time());
+
+            await _unitOfWork.GetCollection<Conversation>().UpdateOneAsync(
+                Builders<Conversation>.Filter.Eq(c => c.Id, conversationId),
+                update);
+
+            // SignalR push to receiver
+            if (OnlineUsers.TryGetValue(receiverId, out string? receiverConnId))
+            {
+                await Clients.Client(receiverConnId).SendAsync("ReceiveMessage", message);
+            }
+
+            // Optional: return ack
+            await Clients.Caller.SendAsync("MessageSent", message);
         }
-
-        // Optional: return ack
-        await Clients.Caller.SendAsync("MessageSent", message);
+        catch (Exception ex)
+        {
+            // Gửi lỗi về client
+            await Clients.Caller.SendAsync("ReceiveException", $"Error sending message: {ex.Message}");
+        }
     }
 
     // MARK AS READ
