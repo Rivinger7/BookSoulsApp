@@ -6,6 +6,7 @@ using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Payment;
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Enums;
 using BookSoulsApp.Domain.Exceptions;
+using Microsoft.OpenApi.Extensions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -40,7 +41,25 @@ namespace BookSoulsApp.Infrastructure.Services
                 .ToListAsync();
 
             // Chuyển đổi sang Response
-            IEnumerable<OrderResponse> orderResponses = _mapper.Map<IEnumerable<OrderResponse>>(orders);
+            IEnumerable<OrderResponse> orderResponses = orders.Select(o => new OrderResponse
+            {
+                Id = o.Id,
+                CustomerId = o.CustomerId,
+                Code = o.Code,
+                TotalPrice = o.TotalPrice,
+                OrderStatus = o.OrderStatus.GetDisplayName(),
+                CancelReason = o.CancelReason,
+                PaymentStatus = o.PaymentStatus.GetDisplayName(),
+                CreatedAt = o.CreatedAt,
+                OrderBooks = o.OrderBooks.Select(ob => new OrderBooks
+                {
+                    BookId = ob.BookId,
+                    BookTitle = ob.BookTitle,
+                    BookPrice = ob.BookPrice,
+                    Quantity = ob.Quantity
+                }).ToList()
+            });
+
 
             return new PaginatedResult<OrderResponse>
             {
@@ -51,10 +70,27 @@ namespace BookSoulsApp.Infrastructure.Services
 
         public async Task<OrderResponse> GetOrderByIdAsync(string orderId)
         {
-            Order order = await _unitOfWork.GetCollection<Order>().Find(o => o.Id == orderId).FirstOrDefaultAsync()
+            Order o = await _unitOfWork.GetCollection<Order>().Find(o => o.Id == orderId).FirstOrDefaultAsync()
                 ?? throw new NotFoundCustomException("Order Not Found");
 
-            return _mapper.Map<OrderResponse>(order);
+            return new OrderResponse
+            {
+                Id = o.Id,
+                CustomerId = o.CustomerId,
+                Code = o.Code,
+                TotalPrice = o.TotalPrice,
+                OrderStatus = o.OrderStatus.GetDisplayName(),
+                CancelReason = o.CancelReason,
+                PaymentStatus = o.PaymentStatus.GetDisplayName(),
+                CreatedAt = o.CreatedAt,
+                OrderBooks = o.OrderBooks.Select(ob => new OrderBooks
+                {
+                    BookId = ob.BookId,
+                    BookTitle = ob.BookTitle,
+                    BookPrice = ob.BookPrice,
+                    Quantity = ob.Quantity
+                }).ToList()
+            };
         }
 
         public async Task<string> CreateOrder(CreateOrderRequest req)
