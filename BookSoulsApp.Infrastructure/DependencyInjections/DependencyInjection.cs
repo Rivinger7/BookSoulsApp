@@ -107,6 +107,7 @@ public static class DependencyInjection
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJsonWebToken, JsonWebToken>();
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IPayosService, PayosService>();
         services.AddScoped<IChatService, ChatService>();
