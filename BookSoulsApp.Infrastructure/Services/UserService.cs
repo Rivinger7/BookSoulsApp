@@ -158,6 +158,31 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
             updates.Add(updateBuilder.Set(u => u.Gender, updateUserRequest.Gender));
         }
 
+        if (!string.IsNullOrEmpty(updateUserRequest.Address?.Ward))
+        {
+            updates.Add(updateBuilder.Set(u => u.Address.Ward, updateUserRequest.Address.Ward));
+        }
+
+        if (!string.IsNullOrEmpty(updateUserRequest.Address?.Street))
+        {
+            updates.Add(updateBuilder.Set(u => u.Address.Street, updateUserRequest.Address.Street));
+        }
+
+        if (!string.IsNullOrEmpty(updateUserRequest.Address?.District))
+        {
+            updates.Add(updateBuilder.Set(u => u.Address.District, updateUserRequest.Address.District));
+        }
+
+        if (!string.IsNullOrEmpty(updateUserRequest.Address?.City))
+        {
+            updates.Add(updateBuilder.Set(u => u.Address.City, updateUserRequest.Address.City));
+        }
+
+        if (!string.IsNullOrEmpty(updateUserRequest.Address?.Country))
+        {
+            updates.Add(updateBuilder.Set(u => u.Address.Country, updateUserRequest.Address.Country));
+        }
+
         if (updateUserRequest.Avatar is not null)
         {
             ImageUploadResult upload = _cloudinaryService.UploadImage(updateUserRequest.Avatar, ImageTag.Users_Profile);

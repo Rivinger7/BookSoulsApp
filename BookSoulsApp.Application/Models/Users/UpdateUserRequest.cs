@@ -1,4 +1,5 @@
-﻿using BookSoulsApp.Domain.Entities;
+﻿using BookSoulsApp.Application.Models.Addresses;
+using BookSoulsApp.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
 namespace BookSoulsApp.Application.Models.Users;
@@ -8,5 +9,5 @@ public class UpdateUserRequest
     public string? PhoneNumber { get; set; }
     public string? Gender { get; set; }
     public IFormFile? Avatar { get; set; }
-    public Address? Address { get; set; }
+    public AddressRequest? Address { get; set; }
 }
