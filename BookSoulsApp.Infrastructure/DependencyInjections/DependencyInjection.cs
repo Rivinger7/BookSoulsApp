@@ -2,11 +2,13 @@
 using BookSoulsApp.Application.Mappers;
 using BookSoulsApp.Application.ServiceInterfaces;
 using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Cloudinary;
+using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Payment;
 using BookSoulsApp.Domain.Enums.SchemaFilter;
 using BookSoulsApp.Domain.Exceptions;
 using BookSoulsApp.Domain.Utils;
 using BookSoulsApp.Infrastructure.Services;
 using BookSoulsApp.Infrastructure.ThirdPartyServices.Cloudinaries;
+using BookSoulsApp.Infrastructure.ThirdPartyServices.Payment;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,11 +32,13 @@ public static class DependencyInjection
         services.AddAutoMapper(typeof(MappingProfile));
         services.ConfigRoute();
 
-        services.AddAuthorization();
         services.AddAuthentication();
+        services.AddAuthorization();
 
         services.AddDatabase();
         services.AddServices();
+
+        services.AddSignalR();
 
         services.AddCloudinary();
 
@@ -104,6 +108,9 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJsonWebToken, JsonWebToken>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IPayosService, PayosService>();
+        services.AddScoped<IChatService, ChatService>();
     }
 
     public static void AddCloudinary(this IServiceCollection services)
@@ -182,16 +189,16 @@ public static class DependencyInjection
                     // Lấy origin từ request
                     string? origin = context.Request.Headers.Origin;
 
-                    // Các origin được phép truy cập
-                    IEnumerable<string?> securedOrigins = new[]
-                    {
-                            Environment.GetEnvironmentVariable("SPOTIFY_HUB_CORS_ORIGIN_FE_PRODUCTION"),
-                            Environment.GetEnvironmentVariable("SPOTIFY_HUB_CORS_ORIGIN_FE_01_DEVELOPMENT"),
-                            Environment.GetEnvironmentVariable("PAY_OS_CORE_ORIGIN")
-                        }.Where(origin => !string.IsNullOrWhiteSpace(origin));
+                    //// Các origin được phép truy cập
+                    //IEnumerable<string?> securedOrigins = new[]
+                    //{
+                    //        Environment.GetEnvironmentVariable("SPOTIFY_HUB_CORS_ORIGIN_FE_PRODUCTION"),
+                    //        Environment.GetEnvironmentVariable("SPOTIFY_HUB_CORS_ORIGIN_FE_01_DEVELOPMENT"),
+                    //        Environment.GetEnvironmentVariable("PAY_OS_CORE_ORIGIN")
+                    //}.Where(origin => !string.IsNullOrWhiteSpace(origin));
 
                     // Kiểm tra xem origin có trong danh sách được phép không
-                    if (string.IsNullOrWhiteSpace(origin) || !securedOrigins.Any(securedOrigin => securedOrigin is not null && securedOrigin.Equals(origin, StringComparison.Ordinal)))
+                    if (string.IsNullOrWhiteSpace(origin))
                     {
                         return Task.CompletedTask;
                     }
@@ -201,15 +208,15 @@ public static class DependencyInjection
                     PathString path = context.HttpContext.Request.Path;
 
                     // Các segment được bảo mật
-                    IEnumerable<string?> securedSegments = new[]
-                    {
-                            Environment.GetEnvironmentVariable("SPOTIFYPOOL_HUB_COUNT_STREAM_URL"),
-                            Environment.GetEnvironmentVariable("SPOTIFYPOOL_HUB_PLAYLIST_URL"),
+                    //IEnumerable<string?> securedSegments = new[]
+                    //{
+                    //        Environment.GetEnvironmentVariable("SPOTIFYPOOL_HUB_COUNT_STREAM_URL"),
+                    //        Environment.GetEnvironmentVariable("SPOTIFYPOOL_HUB_PLAYLIST_URL"),
 
-                        }.Where(segment => !string.IsNullOrWhiteSpace(segment)); // Lọc ra các segment không rỗng
+                    //}.Where(segment => !string.IsNullOrWhiteSpace(segment)); // Lọc ra các segment không rỗng
 
                     // Kiểm tra xem path có chứa segment cần xác thực không
-                    if (!string.IsNullOrWhiteSpace(accessToken) && securedSegments.Any(segment => path.StartsWithSegments($"/{segment}", StringComparison.Ordinal)))
+                    if (!string.IsNullOrWhiteSpace(accessToken))
                     {
                         //context.Token = accessToken["Bearer ".Length..].Trim(); // SubString()
                         context.Token = accessToken;
@@ -247,7 +254,7 @@ public static class DependencyInjection
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Healthy Nutrition",
+                Title = "BookSouls",
                 Version = "v1",
                 Description = "",
                 TermsOfService = new Uri("https://myfrontend.com/terms"),

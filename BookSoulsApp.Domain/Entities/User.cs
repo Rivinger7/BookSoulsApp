@@ -13,7 +13,7 @@ public class User
     public string Role { get; set; } // "Customer", "Admin", "Staff"
     public string Gender { get; set; }
     public string Avatar { get; set; }
-    public Address? Address { get; set; }
+    public Address Address { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

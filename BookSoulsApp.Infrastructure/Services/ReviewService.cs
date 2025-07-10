@@ -20,7 +20,7 @@ public class ReviewService(IUnitOfWork unitOfWork, IMapper mapper) : IReviewServ
 
         if (!string.IsNullOrEmpty(reviewFilterRequest.Comment))
         {
-            query = query.Where(r => r.Comment.Contains(reviewFilterRequest.Comment, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(r => r.Comment.ToLower().Contains(reviewFilterRequest.Comment.ToLower()));
         }
 
         if (!string.IsNullOrEmpty(reviewFilterRequest.BookId))
@@ -157,7 +157,7 @@ public class ReviewService(IUnitOfWork unitOfWork, IMapper mapper) : IReviewServ
             .FirstOrDefaultAsync();
 
         UpdateDefinition<Book> updateDefinition = Builders<Book>.Update
-            .Set(b => b.Rating, (rating + createReviewRequest.Rating) / (reviewCount + 1))
+            .Set(b => b.Rating, (rating * reviewCount + createReviewRequest.Rating) / (reviewCount + 1))
             .Inc(b => b.RatingCount, 1)
             .Set(b => b.UpdatedAt, TimeControl.GetUtcPlus7Time());
 
