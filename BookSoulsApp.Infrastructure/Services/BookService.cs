@@ -23,11 +23,11 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
 
         if (!string.IsNullOrEmpty(bookFilterRequest.Title))
         {
-            query = query.Where(b => b.Title.Contains(bookFilterRequest.Title, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(b => b.Title.ToLower().Contains(bookFilterRequest.Title.ToLower()));
         }
         if (!string.IsNullOrEmpty(bookFilterRequest.Author))
         {
-            query = query.Where(b => b.Author.Contains(bookFilterRequest.Author, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(b => b.Author.ToLower().Contains(bookFilterRequest.Author.ToLower()));
         }
         if (!string.IsNullOrEmpty(bookFilterRequest.Isbn))
         {

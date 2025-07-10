@@ -20,7 +20,7 @@ public class ReviewService(IUnitOfWork unitOfWork, IMapper mapper) : IReviewServ
 
         if (!string.IsNullOrEmpty(reviewFilterRequest.Comment))
         {
-            query = query.Where(r => r.Comment.Contains(reviewFilterRequest.Comment, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(r => r.Comment.ToLower().Contains(reviewFilterRequest.Comment.ToLower()));
         }
 
         if (!string.IsNullOrEmpty(reviewFilterRequest.BookId))
