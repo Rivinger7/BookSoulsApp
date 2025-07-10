@@ -168,7 +168,7 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
         UpdateDefinition<User> updateDefinition = updateBuilder.Combine(updates);
 
         // Cập nhật thông tin người dùng
-        UpdateResult updateResult = await _unitOfWork.GetCollection<User>().UpdateOneAsync(userId, updateDefinition);
+        UpdateResult updateResult = await _unitOfWork.GetCollection<User>().UpdateOneAsync(u => u.Id == userId, updateDefinition);
 
         if (updateResult.ModifiedCount == 0)
         {

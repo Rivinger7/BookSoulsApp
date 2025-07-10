@@ -6,6 +6,7 @@ using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Cloudinary;
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Enums;
 using BookSoulsApp.Domain.Exceptions;
+using BookSoulsApp.Domain.Utils;
 using CloudinaryDotNet.Actions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -127,7 +128,7 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
 
             Image = imageUrl,
 
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = TimeControl.GetUtcPlus7Time()
         };
 
         await _unitOfWork.GetCollection<Book>().InsertOneAsync(book);
