@@ -74,6 +74,30 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
         return userProfileResponse;
     }
 
+    public async Task<int> TotalCountUsersAsync()
+    {
+        // Truy vấn để đếm tổng số lượng người dùng
+        long count = await _unitOfWork.GetCollection<User>()
+            .CountDocumentsAsync(_ => true);
+        return (int)count;
+    }
+
+    public async Task<int> TotalCountUsersActiveAsync()
+    {
+        // Truy vấn để đếm số lượng người dùng
+        long count = await _unitOfWork.GetCollection<User>()
+            .CountDocumentsAsync(user => user.IsDeleted == false);
+        return (int)count;
+    }
+
+    public async Task<int> TotalCountUsersDeletedAsync()
+    {
+        // Truy vấn để đếm số lượng người dùng đã bị xóa
+        long count = await _unitOfWork.GetCollection<User>()
+            .CountDocumentsAsync(user => user.IsDeleted == true);
+        return (int)count;
+    }
+
     public async Task CreateUserAsync(CreateUserRequest createUserRequest)
     {
         // Kiểm tra mật khẩu xác nhận

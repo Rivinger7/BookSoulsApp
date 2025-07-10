@@ -60,4 +60,25 @@ public class UserController(IUserService userService) : ControllerBase
         await _userService.DeleteUserByIdAsync(id);
         return NoContent();
     }
+
+    [Authorize(Roles = "Admin"), HttpGet("count/all")]
+    public async Task<IActionResult> GetTotalUsersCount()
+    {
+        int totalUsersCount = await _userService.TotalCountUsersAsync();
+        return Ok(new { TotalUsersCount = totalUsersCount });
+    }
+
+    [Authorize(Roles = "Admin"), HttpGet("count/active")]
+    public async Task<IActionResult> GetActiveUsersCount()
+    {
+        int activeUsersCount = await _userService.TotalCountUsersActiveAsync();
+        return Ok(new { ActiveUsersCount = activeUsersCount });
+    }
+
+    [Authorize(Roles = "Admin"), HttpGet("count/deleted")]
+    public async Task<IActionResult> GetDeletedUsersCount()
+    {
+        int deletedUsersCount = await _userService.TotalCountUsersDeletedAsync();
+        return Ok(new { DeletedUsersCount = deletedUsersCount });
+    }
 }

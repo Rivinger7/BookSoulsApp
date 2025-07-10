@@ -5,6 +5,9 @@ namespace BookSoulsApp.Application.ServiceInterfaces;
 public interface IUserService
 {
     Task ChangePasswordAsync(string newPassword, string oldPassword);
+    Task<int> TotalCountUsersActiveAsync();
+    Task<int> TotalCountUsersAsync();
+    Task<int> TotalCountUsersDeletedAsync();
     Task CreateUserAsync(CreateUserRequest createUserRequest);
     Task DeleteUserByIdAsync(string id);
     Task EditProfileAsync(UpdateUserRequest updateUserRequest);

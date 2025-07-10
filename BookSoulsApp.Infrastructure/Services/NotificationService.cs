@@ -1,31 +1,35 @@
 ﻿using AutoMapper;
-using BookSoulsApp.Application.Models.Books;
 using BookSoulsApp.Application.Models.Notifications;
 using BookSoulsApp.Application.Models.Pagination;
-using BookSoulsApp.Application.Models.Reviews;
 using BookSoulsApp.Application.ServiceInterfaces;
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Exceptions;
 using BookSoulsApp.Domain.Utils;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BookSoulsApp.Infrastructure.Services;
-public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper) : INotificationService
+public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor) : INotificationService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IMapper _mapper = mapper;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public async Task CreateNotificationAsync(CreateNotificationRequest createNotificationRequest)
     {
-        if(string.IsNullOrEmpty(createNotificationRequest.UserId))
+        // UserID lấy từ phiên người dùng có thể là FE hoặc BE
+        string? userId = _httpContextAccessor.HttpContext?.User.FindFirst("Id")?.Value;
+
+        // Kiểm tra UserId
+        if (string.IsNullOrEmpty(userId))
         {
-			throw new BadRequestCustomException("UserID cannot be null or empty.");
-		}
-		Notification notification = new Notification()
+            throw new Exception("Your session is limit, you must login again!");
+        }
+
+        Notification notification = new()
 		{
-			UserId = createNotificationRequest.UserId,
+			UserId = userId,
 			Title = createNotificationRequest.Title,
 			Content = createNotificationRequest.Content,
 			CreatedAt = TimeControl.GetUtcPlus7Time(),
@@ -46,20 +50,30 @@ public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper) : INoti
 
     public async Task<PaginatedResult<NotificationResponse>> GetNotificationsAsync(NotificationFilterRequest notificationFilterRequest, int pageIndex = 1, int limit = 10)
     {
-		IQueryable<Notification> query = _unitOfWork.GetCollection<Notification>().AsQueryable();
+        // UserID lấy từ phiên người dùng có thể là FE hoặc BE
+        string? userId = _httpContextAccessor.HttpContext?.User.FindFirst("Id")?.Value;
+
+        IQueryable<Notification> query = _unitOfWork.GetCollection<Notification>().AsQueryable();
+
+        // Kiểm tra UserId
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new Exception("Your session is limit, you must login again!");
+        }
+
 		// UserID
-		if (!string.IsNullOrEmpty(notificationFilterRequest.UserID))
+		if (!string.IsNullOrEmpty(userId))
 		{
-			query = query.Where(n => n.UserId == notificationFilterRequest.UserID);
+			query = query.Where(n => n.UserId == userId);
 		}
 		// TIle and Content
 		if (!string.IsNullOrEmpty(notificationFilterRequest.Title))
 		{
-			query = query.Where(n => n.Title.Contains(notificationFilterRequest.Title, StringComparison.OrdinalIgnoreCase));
+			query = query.Where(n => n.Title.ToLower().Contains(notificationFilterRequest.Title.ToLower()));
 		}
 		if (!string.IsNullOrEmpty(notificationFilterRequest.Content))
 		{
-			query = query.Where(n => n.Content.Contains(notificationFilterRequest.Content, StringComparison.OrdinalIgnoreCase));
+			query = query.Where(n => n.Content.ToLower().Contains(notificationFilterRequest.Content.ToLower()));
 		}
 		// Date
 		if (notificationFilterRequest.FromDate.HasValue && notificationFilterRequest.ToDate.HasValue)
@@ -93,9 +107,18 @@ public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper) : INoti
 		};
 	}
 
-    public async Task<int> GetUnreadNotificationCountAsync(string userId)
+    public async Task<int> GetUnreadNotificationCountAsync()
     {
-		IQueryable<Notification> query = _unitOfWork.GetCollection<Notification>().AsQueryable();
+        // UserID lấy từ phiên người dùng có thể là FE hoặc BE
+        string? userId = _httpContextAccessor.HttpContext?.User.FindFirst("Id")?.Value;
+
+        // Kiểm tra UserId
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new Exception("Your session is limit, you must login again!");
+        }
+
+        IQueryable<Notification> query = _unitOfWork.GetCollection<Notification>().AsQueryable();
 		// UserID
 		if (!string.IsNullOrEmpty(userId))
 		{
