@@ -79,10 +79,12 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
         // Chuyển đổi sang Response
         IEnumerable<BookResponse> bookResponses = _mapper.Map<IEnumerable<BookResponse>>(books);
 
+        long total = await _unitOfWork.GetCollection<Book>().CountDocumentsAsync(b => !b.IsDeleted);
+
         return new PaginatedResult<BookResponse>
         {
             Items = bookResponses,
-            TotalCount = books.Count(),
+            TotalCount = total,
         };
     }
 
