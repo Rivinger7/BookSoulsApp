@@ -49,7 +49,7 @@ namespace BookSoulsApp.Infrastructure.ThirdPartyServices.Payment
                 (int)order.TotalPrice,
                 "Thanh toán đơn hàng",
                 items,
-                cancelUrl: _cancelUrl + paymentCode,
+                cancelUrl: _cancelUrl,// + paymentCode,
                 returnUrl: _returnUrl,
                 expiredAt: expiredAt); // hạn link thanh toán 15 phút
             // tạo link thanh toán
