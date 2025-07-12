@@ -10,7 +10,7 @@ namespace BookSoulsApp.Domain.Enums
         Accepted = 1,
         [EnumMember(Value = "Hủy đơn")]
         Cancel = 2,
-        [EnumMember(Value = "Đang giao hàng")]
-        Shipping = 3,
+        [EnumMember(Value = "Hoàn thành")]
+        Completed = 3,
     }
 }

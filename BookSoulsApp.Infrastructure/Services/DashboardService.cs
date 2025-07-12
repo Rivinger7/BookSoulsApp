@@ -15,7 +15,7 @@ namespace BookSoulsApp.Infrastructure.Services
             var builder = Builders<Order>.Filter;
             var filter = builder.Gte(o => o.CreatedAt, fromDate.Date) &
                          builder.Lte(o => o.CreatedAt, toDate.Date.AddDays(1).AddTicks(-1)) & // end of day
-                         builder.Eq(o => o.OrderStatus, OrderStatus.Shipping) & // Chỉ lấy đơn hoàn tất
+                         builder.Eq(o => o.OrderStatus, OrderStatus.Completed) & // Chỉ lấy đơn hoàn tất
                          builder.Eq(o => o.PaymentStatus, PaymentStatus.Paid); // Chỉ lấy đơn hoàn tất
 
             var orders = await _unitOfWork.GetCollection<Order>().Find(filter).ToListAsync();
