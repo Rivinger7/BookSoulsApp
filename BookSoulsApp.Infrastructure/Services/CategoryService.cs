@@ -22,10 +22,13 @@ public class CategoryService(IUnitOfWork unitOfWork, IMapper mapper) : ICategory
 
         IEnumerable<CategoryResponse> categoryResponses = _mapper.Map<IEnumerable<CategoryResponse>>(categories);
 
+        long totalCount = await _unitOfWork.GetCollection<Category>()
+            .CountDocumentsAsync(c => c.IsDeleted == false);
+
         return new PaginatedResult<CategoryResponse>
         {
             Items = categoryResponses,
-            TotalCount = categoryResponses.Count()
+            TotalCount = totalCount
         };
     }
 

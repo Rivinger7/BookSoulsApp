@@ -96,10 +96,13 @@ public class ReviewService(IUnitOfWork unitOfWork, IMapper mapper) : IReviewServ
             return reviewResponse;
         });
 
+        long totalCount = await _unitOfWork.GetCollection<Review>()
+            .CountDocumentsAsync(r => r.IsDeleted == false);
+
         return new PaginatedResult<ReviewResponse>
         {
             Items = reviewResponses,
-            TotalCount = reviewResponses.Count(),
+            TotalCount = totalCount,
         };
     }
 

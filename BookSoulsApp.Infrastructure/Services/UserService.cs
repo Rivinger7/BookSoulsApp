@@ -30,10 +30,13 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
         // Chuyển đổi sang danh sách DTO
         IEnumerable<UserReponse> userAccountsDto = _mapper.Map<IEnumerable<UserReponse>>(users);
 
+        long totalCount = await _unitOfWork.GetCollection<User>()
+            .CountDocumentsAsync(u => u.IsDeleted == false);
+
         return new PaginatedResult<UserReponse>
         {
             Items = userAccountsDto,
-            TotalCount = userAccountsDto.Count()
+            TotalCount = totalCount
         };
     }
 

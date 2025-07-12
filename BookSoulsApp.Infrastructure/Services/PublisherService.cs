@@ -22,10 +22,13 @@ public class PublisherService(IUnitOfWork unitOfWork, IMapper mapper) : IPublish
 
         IEnumerable<PublisherResponse> publisherResponses = _mapper.Map<IEnumerable<PublisherResponse>>(publishers);
 
+        long totalCount = await _unitOfWork.GetCollection<Publisher>()
+            .CountDocumentsAsync(p => p.IsDeleted == false);
+
         return new PaginatedResult<PublisherResponse>
         {
             Items = publisherResponses,
-            TotalCount = publisherResponses.Count()
+            TotalCount = totalCount
         };
     }
 

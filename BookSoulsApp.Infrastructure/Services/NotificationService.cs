@@ -100,10 +100,13 @@ public class NotificationService(IUnitOfWork unitOfWork, IMapper mapper, IHttpCo
 		// Chuyển đổi sang Response
 		IEnumerable<NotificationResponse> notificationResponses = _mapper.Map<IEnumerable<NotificationResponse>>(notifications);
 
-		return new PaginatedResult<NotificationResponse>
+		long totalCount = await _unitOfWork.GetCollection<Notification>()
+			.CountDocumentsAsync(n => n.UserId == userId && n.IsDeleted == false);
+
+        return new PaginatedResult<NotificationResponse>
 		{
 			Items = notificationResponses,
-			TotalCount = notifications.Count(),
+			TotalCount = totalCount,
 		};
 	}
 
