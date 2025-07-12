@@ -111,6 +111,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IPayosService, PayosService>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IDashboardService, DashboardService>();
     }
 
     public static void AddCloudinary(this IServiceCollection services)
