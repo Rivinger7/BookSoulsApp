@@ -30,19 +30,17 @@ public class NotificationController(INotificationService notificationService) : 
 		return Ok(new {Message = "Mark notification as read successfully"});
 	}
 
-	[Authorize(Roles = "Admin, User, Staff"), HttpPost]
+	[Authorize(Roles = "Admin,Customer,Staff"), HttpPost]
 	public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationRequest createNotificationRequest)
 	{
 		await _notificationService.CreateNotificationAsync(createNotificationRequest);
 		return Ok(new { Message = "Created review successfully" });
 	}
 
-	[Authorize(Roles = "Admin, User, Staff"), HttpDelete("{id}")]
+	[Authorize(Roles = "Admin,Customer,Staff"), HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteNotification(string id)
 	{
 		await _notificationService.DeletedNotificationByIdAsync(id);
 		return Ok(new { Message = "Deleted notification successfully" });
 	}
-
-	
 } 
