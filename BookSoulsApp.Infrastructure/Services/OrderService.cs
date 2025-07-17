@@ -6,6 +6,7 @@ using BookSoulsApp.Application.ThirdPartyServiceInterfaces.Payment;
 using BookSoulsApp.Domain.Entities;
 using BookSoulsApp.Domain.Enums;
 using BookSoulsApp.Domain.Exceptions;
+using CloudinaryDotNet;
 using Microsoft.OpenApi.Extensions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -34,6 +35,10 @@ namespace BookSoulsApp.Infrastructure.Services
             {
                 query = query.Where(o => o.PaymentStatus == req.PaymentStatus);
             }
+            
+            // Đếm tổng số Order thỏa điều kiện trước khi phân trang
+            int totalCount = await query.CountAsync();
+            
             // Phân trang và thực hiện truy vấn
             IEnumerable<Order> orders = await query
                 .Skip((pageIndex - 1) * limit)
@@ -64,7 +69,7 @@ namespace BookSoulsApp.Infrastructure.Services
             return new PaginatedResult<OrderResponse>
             {
                 Items = orderResponses,
-                TotalCount = orders.Count(),
+                TotalCount = totalCount
             };
         }
 

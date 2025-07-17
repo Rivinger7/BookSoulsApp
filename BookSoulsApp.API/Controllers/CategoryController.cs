@@ -26,21 +26,21 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
         return Ok(new { message = $"Category with ID {id} retrieved successfully", result });
     }
 
-    [Authorize(Roles = "Admin"), HttpPost]
+    [Authorize(Roles = "Staff"), HttpPost]
     public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequest createCategoryRequest)
     {
         await _categoryService.CreateCategoryAsync(createCategoryRequest);
         return Ok(new {Message = "Created category Successfully"});
     }
 
-    [Authorize(Roles = "Admin"), HttpPut("{id}")]
+    [Authorize(Roles = "Staff"), HttpPut("{id}")]
     public async Task<IActionResult> UpdateCategory(string id,[FromBody] UpdateCategoryRequest updateCategoryRequest)
     {
         await _categoryService.UpdateCategoryByIdAsync(id, updateCategoryRequest);
         return Ok(new { Message = "Updated category Successfully" });
     }
 
-    [Authorize(Roles = "Admin"), HttpDelete("{id}")]
+    [Authorize(Roles = "Staff"), HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(string id)
     {
         await _categoryService.DeleteCategoryByIdAsync(id);
