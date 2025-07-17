@@ -159,25 +159,25 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
         {
             updates.Add(updateBuilder.Set(b => b.PublisherId, updateBookRequest.PublisherId));
         }
-        if (updateBookRequest.CategoryIds.Count == 0)
+        if (updateBookRequest.CategoryIds.Count > 0)
         {
             updates.Add(updateBuilder.Set(b => b.CategoryIds, updateBookRequest.CategoryIds));
         }
-        if (updateBookRequest.ReleaseYear is null)
+        if (updateBookRequest.ReleaseYear.HasValue)
         {
-            updates.Add(updateBuilder.Set(b => b.ReleaseYear, updateBookRequest.ReleaseYear));
+            updates.Add(updateBuilder.Set(b => b.ReleaseYear, updateBookRequest.ReleaseYear.Value));
         }
-        if (updateBookRequest.IsStricted is null)
+        if (updateBookRequest.Price.HasValue)
         {
-            updates.Add(updateBuilder.Set(b => b.IsStricted, updateBookRequest.IsStricted));
+            updates.Add(updateBuilder.Set(b => b.Price, updateBookRequest.Price.Value));
         }
-        if (updateBookRequest.Price is null)
+        if (updateBookRequest.Stock.HasValue)
         {
-            updates.Add(updateBuilder.Set(b => b.Price, updateBookRequest.Price));
+            updates.Add(updateBuilder.Set(b => b.Stock, updateBookRequest.Stock.Value));
         }
-        if (updateBookRequest.Stock is null)
+        if (updateBookRequest.IsStricted.HasValue)
         {
-            updates.Add(updateBuilder.Set(b => b.Stock, updateBookRequest.Stock));
+            updates.Add(updateBuilder.Set(b => b.IsStricted, updateBookRequest.IsStricted.Value));
         }
 
 
