@@ -22,6 +22,9 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
     {
         IQueryable<Book> query = _unitOfWork.GetCollection<Book>().AsQueryable();
 
+        // Không lấy sách đã bị xóa
+        query = query.Where(b => !b.IsDeleted);
+
         if (!string.IsNullOrEmpty(bookFilterRequest.Title))
         {
             query = query.Where(b => b.Title.ToLower().Contains(bookFilterRequest.Title.ToLower()));
@@ -79,7 +82,8 @@ public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryServ
         // Chuyển đổi sang Response
         IEnumerable<BookResponse> bookResponses = _mapper.Map<IEnumerable<BookResponse>>(books);
 
-        long total = await _unitOfWork.GetCollection<Book>().CountDocumentsAsync(b => !b.IsDeleted);
+        //long total = await _unitOfWork.GetCollection<Book>().CountDocumentsAsync(b => !b.IsDeleted);
+        long total = await query.CountAsync();
 
         return new PaginatedResult<BookResponse>
         {
