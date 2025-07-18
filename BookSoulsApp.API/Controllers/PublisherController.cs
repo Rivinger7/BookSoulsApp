@@ -26,21 +26,21 @@ public class PublisherController(IPublisherService publisherService) : Controlle
         return Ok(new { message = $"Publisher with ID {id} retrieved successfully", result });
     }
 
-    [Authorize(Roles = "Admin"), HttpPost]
+    [Authorize(Roles = "Staff"), HttpPost]
     public async Task<IActionResult> CreatePublisher([FromBody] CreatePublisherRequest createPublisherRequest)
     {
         await _publisherService.CreatePublisherAsync(createPublisherRequest);
         return Ok(new { Message = "Created publisher Successfully" });
     }
 
-    [Authorize(Roles = "Admin"), HttpPut("{id}")]
+    [Authorize(Roles = "Staff"), HttpPut("{id}")]
     public async Task<IActionResult> UpdatePublisher(string id, [FromBody] UpdatePublisherRequest updatePublisherRequest)
     {
         await _publisherService.UpdatePublisherByIdAsync(id, updatePublisherRequest);
         return Ok(new { Message = "Updated publisher Successfully" });
     }
 
-    [Authorize(Roles = "Admin"), HttpDelete("{id}")]
+    [Authorize(Roles = "Staff"), HttpDelete("{id}")]
     public async Task<IActionResult> DeletePublisher(string id)
     {
         await _publisherService.DeletePublisherByIdAsync(id);
